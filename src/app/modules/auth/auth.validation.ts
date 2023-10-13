@@ -21,5 +21,13 @@ const createUser = z.object({
     role: z.enum([ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.CUSTOMER]).optional(),
   }),
 });
-
-export const AuthValidation = { createUser };
+const loginUser = z.object({
+  body: z.object({
+    email: z.string().email({ message: 'Invalid Email' }),
+    password: z
+      .string()
+      .min(6, { message: 'Minimum 6 characters required' })
+      .max(16, { message: 'Maximum 16 characters are allowed' }),
+  }),
+});
+export const AuthValidation = { createUser, loginUser };

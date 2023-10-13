@@ -1,9 +1,15 @@
 import { User } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import httpStatus from 'http-status';
 import config from '../../../config';
+import ApiError from '../../../errors/ApiError';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
 import prisma from '../../../shared/prisma';
-import { IRegistrationResponses } from './auth.interface';
+import {
+  ILogin,
+  ILoginResponses,
+  IRegistrationResponses,
+} from './auth.interface';
 const createUser = async (user: User): Promise<IRegistrationResponses> => {
   user.password = await bcrypt.hash(
     user.password,
@@ -25,4 +31,26 @@ const createUser = async (user: User): Promise<IRegistrationResponses> => {
   );
   return { accessToken, refreshToken, user: rest };
 };
-export const AuthService = { createUser };
+const loginUser = async (payload: ILogin): Promise<ILoginResponses> => {
+  const { email, password } = payload;
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: email,
+    },
+  });
+  const isPasswordMatch = await bcrypt.compare(password, user?.password);
+  if (isPasswordMatch)
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Incorrect Password');
+  const accessToken = jwtHelpers.createToken(
+    { id: user.id, role: user.role },
+    config.jwt.secret,
+    config.jwt.expires_in,
+  );
+  const refreshToken = jwtHelpers.createToken(
+    { id: user.id, role: user.role },
+    config.jwt.refresh_secret,
+    config.jwt.refresh_expires_in,
+  );
+  return { accessToken, refreshToken };
+};
+export const AuthService = { createUser, loginUser };

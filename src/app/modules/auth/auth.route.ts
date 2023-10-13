@@ -9,4 +9,9 @@ router.post(
   validateRequest(AuthValidation.createUser),
   AuthController.createUser,
 );
+router.post(
+  '/login',
+  validateRequest(AuthValidation.loginUser),
+  AuthController.loginUser,
+);
 export const AuthRoutes = router;

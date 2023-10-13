@@ -21,4 +21,19 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
     message: 'User Registration Successfully',
   });
 });
-export const AuthController = { createUser };
+const loginUser = catchAsync(async (req: Request, res: Response) => {
+  const payload = req.body;
+  const { accessToken, refreshToken } = await AuthService.loginUser(payload);
+  const cookieOptions = {
+    secure: config.env === 'production',
+    httpOnly: true,
+  };
+
+  res.cookie('refreshToken', refreshToken, cookieOptions);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'User Login Successfully',
+    data: { accessToken },
+  });
+});
+export const AuthController = { createUser, loginUser };

@@ -5,3 +5,12 @@ export type IRegistrationResponses = {
   accessToken: string;
   user: Partial<User>;
 };
+export type ILoginResponses = {
+  refreshToken: string;
+  accessToken: string;
+};
+
+export type ILogin = {
+  email: string;
+  password: string;
+};
