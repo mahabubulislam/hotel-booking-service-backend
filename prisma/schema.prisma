@@ -44,9 +44,9 @@ model Room {
 }
 
 model Category {
-  id   String       @id @default(uuid())
-  name RoomCategory
-  Room Room[]
+  id    String       @id @default(uuid())
+  name  RoomCategory
+  rooms Room[]
 }
 
 enum RoomCategory {

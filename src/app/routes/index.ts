@@ -1,5 +1,6 @@
 import express from 'express';
 import { AuthRoutes } from '../modules/auth/auth.route';
+import { CategoryRoutes } from '../modules/category/category.route';
 import { FacilityRoutes } from '../modules/facility/facility.route';
 import { RoomRoutes } from '../modules/room/room.route';
 
@@ -13,6 +14,10 @@ const moduleRoutes = [
   {
     path: '/facility',
     route: FacilityRoutes,
+  },
+  {
+    path: '/category',
+    route: CategoryRoutes,
   },
   {
     path: '/room',

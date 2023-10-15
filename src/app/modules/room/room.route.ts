@@ -12,5 +12,5 @@ router.post(
   validateRequest(RoomValidation.createRoom),
   RoomController.createRoom,
 );
-
+router.get('/', RoomController.getAllRoom);
 export const RoomRoutes = router;
