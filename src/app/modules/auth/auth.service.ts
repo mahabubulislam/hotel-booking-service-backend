@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import config from '../../../config';
@@ -10,26 +10,28 @@ import {
   ILoginResponses,
   IRegistrationResponses,
 } from './auth.interface';
-const createUser = async (user: User): Promise<IRegistrationResponses> => {
+const createUser = async (
+  user: Prisma.UserCreateInput,
+): Promise<IRegistrationResponses> => {
   user.password = await bcrypt.hash(
     user.password,
     Number(config.bcrypt_salt_rounds),
   );
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const { password, ...rest } = await prisma.user.create({
+  const { password, ...userData } = await prisma.user.create({
     data: user,
   });
   const accessToken = jwtHelpers.createToken(
-    { id: user.id },
+    { id: userData.id, role: userData.role },
     config.jwt.secret,
     config.jwt.expires_in,
   );
   const refreshToken = jwtHelpers.createToken(
-    { id: user.id, role: user.role },
+    { id: userData.id, role: userData.role },
     config.jwt.refresh_secret,
     config.jwt.refresh_expires_in,
   );
-  return { accessToken, refreshToken, user: rest };
+  return { accessToken, refreshToken, user: userData };
 };
 const loginUser = async (payload: ILogin): Promise<ILoginResponses> => {
   const { email, password } = payload;

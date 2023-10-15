@@ -2,6 +2,10 @@ import { z } from 'zod';
 import { ENUM_USER_ROLE } from '../../../enums/user';
 const createUser = z.object({
   body: z.object({
+    title: z.string({
+      required_error: 'Title is required',
+      invalid_type_error: 'Title must be a string',
+    }),
     first_name: z.string({
       required_error: 'First name is required',
       invalid_type_error: 'First name must be a string',
