@@ -12,5 +12,11 @@ router.post(
   validateRequest(RoomValidation.createRoom),
   RoomController.createRoom,
 );
+router.patch(
+  '/:id',
+  auth(ENUM_USER_ROLE.ADMIN),
+  validateRequest(RoomValidation.updateRoom),
+  RoomController.updateRoom,
+);
 router.get('/', RoomController.getAllRoom);
 export const RoomRoutes = router;

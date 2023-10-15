@@ -1,14 +1,15 @@
 import { Prisma, Room } from '@prisma/client';
+import httpStatus from 'http-status';
+import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import prisma from '../../../shared/prisma';
 import { roomSearchableFields } from './room.constant';
-import { IRoomFilters } from './room.interface';
+import { IRoomFilters, IUpdateRoom } from './room.interface';
 
 const createRoom = async (payload: Prisma.RoomCreateInput): Promise<Room> => {
   const { facilities, ...room } = payload;
-
   const result = await prisma.room.create({
     data: {
       ...room,
@@ -21,6 +22,81 @@ const createRoom = async (payload: Prisma.RoomCreateInput): Promise<Room> => {
   });
   return result;
 };
+
+const updateRoom = async (roomId: string, payload: IUpdateRoom) => {
+  const { facilities, ...roomData } = payload;
+  const room = await prisma.room.findUnique({
+    where: {
+      id: roomId,
+    },
+    include: {
+      facilities: true,
+    },
+  });
+
+  if (!room) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+  }
+
+  const existingFacilityIds = room.facilities.map(facility => facility.id);
+  const facilityIds = facilities.map(facility => facility.id);
+  // Calculate facilities to add and remove
+  const facilitiesToAdd = facilityIds.filter(
+    id => !existingFacilityIds.includes(id),
+  );
+  const facilitiesToRemove = existingFacilityIds.filter(
+    id => !facilityIds.includes(id),
+  );
+
+  const updatePromises = [];
+
+  if (facilitiesToAdd.length > 0) {
+    updatePromises.push(
+      prisma.room.update({
+        where: { id: roomId },
+        data: {
+          ...roomData,
+          facilities: {
+            connect: facilitiesToAdd.map(facilityId => ({ id: facilityId })),
+          },
+        },
+        include: { facilities: true, category: true },
+      }),
+    );
+  }
+
+  if (facilitiesToRemove.length > 0) {
+    updatePromises.push(
+      prisma.room.update({
+        where: { id: roomId },
+        data: {
+          ...roomData,
+          facilities: {
+            disconnect: facilitiesToRemove.map(facilityId => ({
+              id: facilityId,
+            })),
+          },
+        },
+        include: { facilities: true, category: true },
+      }),
+    );
+  }
+  if (!facilitiesToAdd.length && !facilitiesToRemove.length) {
+    updatePromises.push(
+      prisma.room.update({
+        where: { id: roomId },
+        data: roomData as Partial<Room>,
+
+        include: { facilities: true, category: true },
+      }),
+    );
+  }
+
+  const data = await Promise.all(updatePromises);
+
+  return data[0];
+};
+
 const getAllRoom = async (
   filters: IRoomFilters,
   options: IPaginationOptions,
@@ -77,4 +153,4 @@ const getAllRoom = async (
   const total = await prisma.room.count();
   return { data: rooms, meta: { limit, page, total } };
 };
-export const RoomService = { createRoom, getAllRoom };
+export const RoomService = { createRoom, getAllRoom, updateRoom };

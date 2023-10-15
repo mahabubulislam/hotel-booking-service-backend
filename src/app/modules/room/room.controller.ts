@@ -16,6 +16,16 @@ const createRoom = catchAsync(async (req: Request, res: Response) => {
     message: 'Room created Successfully',
   });
 });
+const updateRoom = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const payload = req.body;
+  const result = await RoomService.updateRoom(id, payload);
+  sendResponse(res, {
+    data: result,
+    statusCode: httpStatus.CREATED,
+    message: 'Room updated Successfully',
+  });
+});
 const getAllRoom = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, roomFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
@@ -28,4 +38,4 @@ const getAllRoom = catchAsync(async (req: Request, res: Response) => {
     message: 'Room fetched Successfully',
   });
 });
-export const RoomController = { createRoom, getAllRoom };
+export const RoomController = { createRoom, getAllRoom, updateRoom };
