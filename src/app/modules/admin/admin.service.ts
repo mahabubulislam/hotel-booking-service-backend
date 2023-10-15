@@ -31,4 +31,19 @@ const getAllAdmins = async (): Promise<Partial<User>[]> => {
   });
   return admins;
 };
-export const AdminService = { createAdmin, getAllAdmins };
+const deleteUser = async (id: string): Promise<Partial<User>> => {
+  const user = await prisma.user.delete({
+    where: { id },
+    select: {
+      email: true,
+      first_name: true,
+      last_name: true,
+      id: true,
+      phone_number: true,
+      title: true,
+      role: true,
+    },
+  });
+  return user;
+};
+export const AdminService = { createAdmin, getAllAdmins, deleteUser };

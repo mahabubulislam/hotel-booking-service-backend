@@ -24,5 +24,14 @@ const getAllAdmin = catchAsync(async (req: Request, res: Response) => {
     message: 'Admin created Successfully',
   });
 });
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await AdminService.deleteUser(id);
 
-export const AdminController = { createAdmin, getAllAdmin };
+  sendResponse<Partial<User>>(res, {
+    data: result,
+    statusCode: httpStatus.OK,
+    message: 'Admin deleted Successfully',
+  });
+});
+export const AdminController = { createAdmin, getAllAdmin, deleteUser };

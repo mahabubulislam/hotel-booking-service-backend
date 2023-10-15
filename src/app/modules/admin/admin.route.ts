@@ -13,5 +13,10 @@ router.post(
   AdminController.createAdmin,
 );
 router.get('/', auth(ENUM_USER_ROLE.SUPER_ADMIN), AdminController.getAllAdmin);
+router.delete(
+  '/delete-user',
+  auth(ENUM_USER_ROLE.SUPER_ADMIN),
+  AdminController.deleteUser,
+);
 
 export const AdminRoutes = router;
