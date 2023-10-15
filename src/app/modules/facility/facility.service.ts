@@ -10,5 +10,31 @@ const createFacility = async (
 
   return facility;
 };
+const updateFacility = async (
+  id: string,
+  payload: Prisma.FacilityUpdateInput,
+): Promise<Facility> => {
+  const facility = await prisma.facility.update({
+    where: { id },
+    data: payload,
+  });
 
-export const FacilityService = { createFacility };
+  return facility;
+};
+const getAllFacility = async (): Promise<Facility[]> => {
+  const result = await prisma.facility.findMany();
+  return result;
+};
+const deleteFacility = async (id: string): Promise<Facility> => {
+  const facility = await prisma.facility.delete({
+    where: { id },
+  });
+
+  return facility;
+};
+export const FacilityService = {
+  createFacility,
+  getAllFacility,
+  updateFacility,
+  deleteFacility,
+};
