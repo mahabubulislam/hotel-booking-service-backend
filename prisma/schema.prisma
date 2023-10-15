@@ -39,6 +39,22 @@ model Room {
   size         String
   images       String[]
   facilities   Facility[]
+  categoryId   String
+  category     Category   @relation(fields: [categoryId], references: [id])
+}
+
+model Category {
+  id   String       @id @default(uuid())
+  name RoomCategory
+  Room Room[]
+}
+
+enum RoomCategory {
+  Classic
+  Budget
+  Luxury
+  Double
+  Single
 }
 
 model Facility {
