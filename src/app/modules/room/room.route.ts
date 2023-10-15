@@ -18,5 +18,12 @@ router.patch(
   validateRequest(RoomValidation.updateRoom),
   RoomController.updateRoom,
 );
+router.get('/:id', RoomController.getSingleRoom);
+router.delete(
+  '/:id',
+  auth(ENUM_USER_ROLE.ADMIN),
+
+  RoomController.deleteRoom,
+);
 router.get('/', RoomController.getAllRoom);
 export const RoomRoutes = router;

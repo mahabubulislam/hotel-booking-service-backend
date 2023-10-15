@@ -153,4 +153,26 @@ const getAllRoom = async (
   const total = await prisma.room.count();
   return { data: rooms, meta: { limit, page, total } };
 };
-export const RoomService = { createRoom, getAllRoom, updateRoom };
+
+const getSingleRoom = async (id: string): Promise<Room | null> => {
+  const room = await prisma.room.findUniqueOrThrow({
+    where: { id },
+    include: { category: true, facilities: true },
+  });
+  return room;
+};
+
+const deleteRoom = async (id: string): Promise<Room | null> => {
+  const room = await prisma.room.delete({
+    where: { id },
+    include: { category: true, facilities: true },
+  });
+  return room;
+};
+export const RoomService = {
+  createRoom,
+  getAllRoom,
+  updateRoom,
+  getSingleRoom,
+  deleteRoom,
+};

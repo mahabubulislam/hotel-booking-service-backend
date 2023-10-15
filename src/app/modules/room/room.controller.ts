@@ -38,4 +38,28 @@ const getAllRoom = catchAsync(async (req: Request, res: Response) => {
     message: 'Room fetched Successfully',
   });
 });
-export const RoomController = { createRoom, getAllRoom, updateRoom };
+const getSingleRoom = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await RoomService.getSingleRoom(id);
+  sendResponse<Room>(res, {
+    data: result,
+    statusCode: httpStatus.OK,
+    message: 'Room fetched Successfully',
+  });
+});
+const deleteRoom = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await RoomService.deleteRoom(id);
+  sendResponse<Room>(res, {
+    data: result,
+    statusCode: httpStatus.OK,
+    message: 'Room deleted Successfully',
+  });
+});
+export const RoomController = {
+  createRoom,
+  getAllRoom,
+  updateRoom,
+  getSingleRoom,
+  deleteRoom,
+};
