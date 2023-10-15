@@ -38,6 +38,8 @@ model Room {
   balcony      Int
   size         String
   images       String[]
+  ratings      Int?
+  review       Int?
   facilities   Facility[]
   categoryId   String
   category     Category   @relation(fields: [categoryId], references: [id])
